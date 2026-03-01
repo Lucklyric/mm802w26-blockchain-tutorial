@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 8: Submit and Verify — Blockchain Tutorial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step7-signing.html">← Previous</a>
+    </nav>
+    <main>
+        <h1>Step 8: Submit and Verify</h1>
+
+        <p>You've built the block, mined a valid hash, and signed it. Now submit it to the blockchain!</p>
+
+        <h2>Server Validation</h2>
+        <p>When you submit a block via <code>POST /mine</code>, the server checks (in order):</p>
+        <ol>
+            <li><strong>Block index</strong> — Must be the next expected index (chain length)</li>
+            <li><strong>Previous hash</strong> — Must match the latest block's hash</li>
+            <li><strong>Hash validity</strong> — Recomputed hash must match the submitted hash</li>
+            <li><strong>Proof of Work</strong> — Hash must start with the required number of zeros</li>
+            <li><strong>Registration</strong> — Your public key must be registered</li>
+            <li><strong>Not already mined</strong> — Your status must be 0 (not already completed)</li>
+            <li><strong>Correct action</strong> — Must be "set_done"</li>
+            <li><strong>Valid signature</strong> — ECDSA signature must verify</li>
+        </ol>
+
+        <h2>Exercise: Part 6 (Submitting)</h2>
+        <p>In <code>client/part6_submit.py</code>, implement:</p>
+
+        <h3>submit_block(server_url, block)</h3>
+        <ol>
+            <li>Send a POST request to <code>{server_url}/mine</code></li>
+            <li>The JSON body is the entire block dict</li>
+            <li>Return the server's JSON response</li>
+        </ol>
+
+        <h2>Running Part 6</h2>
+        <pre><code>uv run python part6_submit.py</code></pre>
+        <p>This script does everything: creates a block, mines it, signs it, and submits it. On success, you'll see:</p>
+        <pre><code>Server response: {'success': True, 'message': 'Block N added by you@ualberta.ca'}
+SUCCESS! Your block is on the chain. Status: DONE</code></pre>
+
+        <h2>Handling Errors</h2>
+
+        <h3>"Invalid index. Expected N"</h3>
+        <p>Someone else mined a block while you were mining yours. The chain has grown, so your block's index and previous_hash are now stale. Simply re-run <code>part6_submit.py</code> — it will fetch the latest chain state and mine a new block.</p>
+        <div class="hint">
+            <strong>This is how real blockchains work!</strong> Miners compete, and the first valid block wins. Losers must re-mine against the new chain tip. This is a feature, not a bug.
+        </div>
+
+        <h3>"Miner already completed"</h3>
+        <p>You've already successfully mined a block. Check <code>/status</code> to confirm.</p>
+
+        <h3>"Hash mismatch"</h3>
+        <p>Your block hash computation doesn't match the server's. Double-check the format string in Part 5.</p>
+
+        <h3>"Invalid signature"</h3>
+        <p>Check that you're signing <code>block_hash.encode()</code> (the hash string, not the block data) with DER encoding.</p>
+
+        <h2>Final Verification</h2>
+        <p>Open your browser and visit:</p>
+        <pre><code>http://&lt;server-ip&gt;/status</code></pre>
+        <p>Find your email in the ledger. If <code>status</code> is <code>1</code>, you've completed the assignment!</p>
+
+        <div class="hint">
+            <strong>Congratulations!</strong> You've successfully:
+            <ul>
+                <li>Generated an ECDSA key pair from a deterministic seed</li>
+                <li>Registered your identity on a blockchain</li>
+                <li>Constructed and mined a block using Proof of Work</li>
+                <li>Signed and submitted your block with a digital signature</li>
+            </ul>
+            These are the core building blocks of Bitcoin and most other blockchains.
+        </div>
+    </main>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step7-signing.html">← Previous</a>
+    </nav>
+</body>
+</html>

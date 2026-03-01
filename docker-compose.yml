@@ -1,0 +1,13 @@
+services:
+  blockchain:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "80:8000"
+    volumes:
+      - chain-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  chain-data:

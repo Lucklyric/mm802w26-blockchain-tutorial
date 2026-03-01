@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 6: Proof of Work — Blockchain Tutorial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step5-chain.html">← Previous</a> |
+        <a href="step7-signing.html">Next →</a>
+    </nav>
+    <main>
+        <h1>Step 6: Proof of Work</h1>
+
+        <p>This is the most important step. Proof of Work (PoW) requires you to find a <strong>nonce</strong> value that, when included in the block hash computation, produces a hash starting with a specific number of zeros.</p>
+
+        <h2>How Mining Works</h2>
+        <pre class="ascii-art">  nonce = 0     -&gt; hash = "8a3f1b..."  (doesn't start with 0000)
+  nonce = 1     -&gt; hash = "f29c04..."
+  nonce = 2     -&gt; hash = "12ab9e..."
+  ...
+  nonce = 47231 -&gt; hash = "0000a8..."  FOUND IT!</pre>
+
+        <p>With difficulty 4, your hash must start with <code>0000</code>. Since SHA256 outputs are essentially random, you need to try roughly 65,536 (16^4) nonces on average. This takes about 0.5 to 5 seconds.</p>
+
+        <h2>Block Hash Computation</h2>
+        <p>The hash is computed from a string with this <strong>exact format</strong>:</p>
+        <pre><code>block_string = f"{index}{timestamp}{json.dumps(data, sort_keys=True)}{previous_hash}{nonce}"
+hash = hashlib.sha256(block_string.encode()).hexdigest()</code></pre>
+
+        <div class="warning">
+            <strong>Critical:</strong> The server uses this exact same format to verify your block. If your format differs even slightly (extra spaces, different key ordering), your hash won't match and the server will reject your block. Use <code>json.dumps(data, sort_keys=True)</code> for deterministic serialization.
+        </div>
+
+        <h2>Exercise: Part 4 — Create Block Structure</h2>
+        <p>Open <code>client/part4_create_block.py</code> and implement:</p>
+
+        <h3>create_block(server_url, email, public_key_hex)</h3>
+        <ol>
+            <li>Fetch the latest block from <code>/latest</code></li>
+            <li>Build a block dict with:
+                <ul>
+                    <li><code>index</code>: latest block's index + 1</li>
+                    <li><code>timestamp</code>: current time (<code>time.time()</code>)</li>
+                    <li><code>data</code>: <code>{"miner_pubkey": ..., "miner_email": ..., "action": "set_done"}</code></li>
+                    <li><code>previous_hash</code>: latest block's hash</li>
+                    <li><code>nonce</code>: 0 (placeholder)</li>
+                    <li><code>hash</code>: "" (placeholder)</li>
+                    <li><code>signature</code>: "" (placeholder)</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h2>Exercise: Part 5 — Mine the Block</h2>
+        <p>Open <code>client/part5_mine.py</code> and implement:</p>
+
+        <h3>compute_block_hash(block)</h3>
+        <ol>
+            <li>Build the block string using the exact format above</li>
+            <li>Return <code>hashlib.sha256(block_string.encode()).hexdigest()</code></li>
+        </ol>
+
+        <h3>mine_block(block, difficulty)</h3>
+        <ol>
+            <li>Start with <code>nonce = 0</code></li>
+            <li>Set <code>block["nonce"] = nonce</code></li>
+            <li>Compute hash with <code>compute_block_hash(block)</code></li>
+            <li>If hash starts with <code>"0" * difficulty</code>, set <code>block["hash"]</code> and return the block</li>
+            <li>Otherwise increment nonce and repeat</li>
+        </ol>
+
+        <h2>Verification</h2>
+        <pre><code>uv run python part4_create_block.py  # Should show block structure
+uv run python part5_mine.py          # Should mine in a few seconds</code></pre>
+        <p>After mining, the block's hash should start with <code>0000</code>.</p>
+
+        <div class="hint">
+            <strong>Tip:</strong> If mining takes more than 30 seconds, double-check your hash format string. A mismatch means every nonce produces an "incorrect" hash.
+        </div>
+    </main>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step5-chain.html">← Previous</a> |
+        <a href="step7-signing.html">Next: Digital Signatures →</a>
+    </nav>
+</body>
+</html>

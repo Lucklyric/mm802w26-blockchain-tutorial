@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 4: Registration — Blockchain Tutorial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step3-keys.html">← Previous</a> |
+        <a href="step5-chain.html">Next →</a>
+    </nav>
+    <main>
+        <h1>Step 4: Registration</h1>
+
+        <p>Before you can mine a block, you must register your public key with the blockchain server. This associates your email with your public key in the server's ledger.</p>
+
+        <h2>The Ledger</h2>
+        <p>The server maintains a ledger that tracks each registered miner:</p>
+        <table>
+            <tr><th>Field</th><th>Description</th></tr>
+            <tr><td><code>email</code></td><td>Your @ualberta.ca email (the key)</td></tr>
+            <tr><td><code>pubkey</code></td><td>Your public key hex string</td></tr>
+            <tr><td><code>status</code></td><td>0 = registered, 1 = block mined</td></tr>
+            <tr><td><code>block_index</code></td><td>Which block you mined (after mining)</td></tr>
+        </table>
+
+        <h2>REST API</h2>
+        <p>Send a POST request to the server:</p>
+        <pre><code>POST /register
+Content-Type: application/json
+
+{
+    "pubkey": "your_public_key_hex",
+    "email": "yourname@ualberta.ca"
+}</code></pre>
+
+        <h2>Exercise: Part 2</h2>
+        <p>Open <code>client/part2_register.py</code> and implement:</p>
+
+        <h3>register(server_url, email, public_key_hex)</h3>
+        <ol>
+            <li>Send a POST request to <code>{server_url}/register</code></li>
+            <li>Include JSON body with <code>pubkey</code> and <code>email</code></li>
+            <li>Return the server's JSON response</li>
+        </ol>
+
+        <div class="hint">
+            <strong>Hint:</strong> Use <code>requests.post(url, json={"pubkey": ..., "email": ...})</code> and <code>response.json()</code>.
+        </div>
+
+        <h2>Verification</h2>
+        <pre><code>uv run python part2_register.py</code></pre>
+        <p>Expected output: <code>{"success": true, "message": "Registered yourname@ualberta.ca"}</code></p>
+
+        <div class="warning">
+            <strong>Note:</strong> You can only register once. If you try to register again, the server will return an error. This is expected — just proceed to the next step.
+        </div>
+    </main>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step3-keys.html">← Previous</a> |
+        <a href="step5-chain.html">Next: Reading the Chain →</a>
+    </nav>
+</body>
+</html>

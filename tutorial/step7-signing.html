@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 7: Digital Signatures — Blockchain Tutorial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step6-mining.html">← Previous</a> |
+        <a href="step8-verification.html">Next →</a>
+    </nav>
+    <main>
+        <h1>Step 7: Digital Signatures</h1>
+
+        <p>Digital signatures prove that <strong>you</strong> mined the block, without revealing your private key. Only the holder of the private key can create a valid signature, but anyone with the public key can verify it.</p>
+
+        <h2>Signing Process</h2>
+        <pre class="ascii-art">  Block Hash (string)
+          |
+          v
+  +-------------------+
+  | ECDSA Sign         |&lt;---- Your Private Key
+  | (SHA256 + DER)     |
+  +---------+---------+
+            |
+            v
+      Signature (hex)</pre>
+
+        <h2>Why Sign the Hash?</h2>
+        <p>We sign the <strong>block hash string</strong> rather than the raw block data. Since the hash already commits to all block fields (index, timestamp, data, nonce, etc.), signing the hash is equivalent to signing the entire block — but simpler to implement.</p>
+
+        <h2>Exercise: Part 6 (Signing)</h2>
+        <p>Open <code>client/part6_submit.py</code> and implement:</p>
+
+        <h3>sign_block(signing_key, block_hash)</h3>
+        <ol>
+            <li>Sign <code>block_hash.encode()</code> using your signing key</li>
+            <li>Use SHA256 as the hash function</li>
+            <li>Use DER encoding (<code>sigencode_der</code>)</li>
+            <li>Return the signature as a hex string</li>
+        </ol>
+
+        <div class="hint">
+            <strong>Hint:</strong> The signing call looks like:
+            <pre><code>signature = signing_key.sign(
+    block_hash.encode(),
+    hashfunc=hashlib.sha256,
+    sigencode=sigencode_der
+)
+return signature.hex()</code></pre>
+        </div>
+
+        <h2>DER Encoding</h2>
+        <p>DER (Distinguished Encoding Rules) is a standard binary format for ECDSA signatures. It encodes the two signature components (r, s) in a compact, unambiguous way. The server expects DER-encoded signatures.</p>
+
+        <p>Continue to Step 8 to submit your signed block!</p>
+    </main>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step6-mining.html">← Previous</a> |
+        <a href="step8-verification.html">Next: Submit and Verify →</a>
+    </nav>
+</body>
+</html>

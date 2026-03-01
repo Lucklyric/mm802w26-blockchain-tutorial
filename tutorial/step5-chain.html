@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 5: Reading the Chain — Blockchain Tutorial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step4-registration.html">← Previous</a> |
+        <a href="step6-mining.html">Next →</a>
+    </nav>
+    <main>
+        <h1>Step 5: Reading the Chain</h1>
+
+        <p>The blockchain server exposes several GET endpoints that let you inspect the current state. Understanding the chain is essential before constructing your block.</p>
+
+        <h2>Available Endpoints</h2>
+        <table>
+            <tr><th>Endpoint</th><th>Returns</th></tr>
+            <tr><td><code>GET /chain</code></td><td>The full blockchain (list of all blocks)</td></tr>
+            <tr><td><code>GET /status</code></td><td>Chain length, difficulty, latest hash, full ledger</td></tr>
+            <tr><td><code>GET /latest</code></td><td>The most recent block</td></tr>
+            <tr><td><code>GET /difficulty</code></td><td>Current difficulty and target prefix</td></tr>
+        </table>
+
+        <h2>Exercise: Part 3</h2>
+        <p>Open <code>client/part3_explore.py</code> and implement four simple GET functions:</p>
+
+        <h3>get_chain(server_url)</h3>
+        <p>GET <code>/chain</code> and return the JSON response</p>
+
+        <h3>get_status(server_url)</h3>
+        <p>GET <code>/status</code> and return the JSON response</p>
+
+        <h3>get_latest_block(server_url)</h3>
+        <p>GET <code>/latest</code> and return the JSON response</p>
+
+        <h3>get_difficulty(server_url)</h3>
+        <p>GET <code>/difficulty</code> and return the JSON response</p>
+
+        <div class="hint">
+            <strong>Hint:</strong> Each function is a single <code>requests.get()</code> call followed by <code>.json()</code>. Very straightforward!
+        </div>
+
+        <h2>Verification</h2>
+        <pre><code>uv run python part3_explore.py</code></pre>
+        <p>You should see:</p>
+        <ul>
+            <li>The chain with at least the genesis block (Block 0)</li>
+            <li>Your email in the ledger with status 0</li>
+            <li>The current difficulty (should be 4)</li>
+            <li>The latest block's hash (you'll need this for Part 4)</li>
+        </ul>
+
+        <h2>What to Look For</h2>
+        <p>Pay attention to these fields in the latest block — you'll need them when constructing your own:</p>
+        <ul>
+            <li><code>index</code> — Your block will be index + 1</li>
+            <li><code>hash</code> — Your block's <code>previous_hash</code> will be this value</li>
+        </ul>
+    </main>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step4-registration.html">← Previous</a> |
+        <a href="step6-mining.html">Next: Proof of Work →</a>
+    </nav>
+</body>
+</html>

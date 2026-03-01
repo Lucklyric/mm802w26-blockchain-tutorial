@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 2: SHA256 and Hashing — Blockchain Tutorial</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step1-overview.html">← Previous</a> |
+        <a href="step3-keys.html">Next →</a>
+    </nav>
+    <main>
+        <h1>Step 2: SHA256 and Hashing</h1>
+
+        <p>Cryptographic hash functions are the backbone of blockchain security. In this tutorial, we use <strong>SHA256</strong> for everything: key generation, block hashing, and Proof of Work.</p>
+
+        <h2>What is a Hash Function?</h2>
+        <ul>
+            <li><strong>Deterministic</strong> — Same input always produces the same output</li>
+            <li><strong>One-way</strong> — You cannot reverse a hash to find the input</li>
+            <li><strong>Fixed-size output</strong> — SHA256 always produces 256 bits (64 hex characters)</li>
+            <li><strong>Avalanche effect</strong> — A tiny change in input completely changes the output</li>
+        </ul>
+
+        <h2>Try It Yourself</h2>
+        <p>Open a Python terminal and experiment:</p>
+        <pre><code>import hashlib
+
+# Hash a simple string
+h1 = hashlib.sha256(b"hello").hexdigest()
+print(h1)
+# 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+
+# Change one character — completely different hash
+h2 = hashlib.sha256(b"Hello").hexdigest()
+print(h2)
+# 185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969
+
+# Hashes are always 64 hex characters (256 bits)
+print(len(h1))  # 64</code></pre>
+
+        <h2>Role in Blockchain</h2>
+        <p>SHA256 is used in three critical ways:</p>
+        <ol>
+            <li><strong>Key generation</strong> — Your email + random numbers are hashed to create a deterministic seed</li>
+            <li><strong>Block hashing</strong> — All block fields are combined into a string and hashed</li>
+            <li><strong>Proof of Work</strong> — You search for a nonce that makes the hash start with zeros</li>
+        </ol>
+
+        <h2>Block Hash Format</h2>
+        <p>In this tutorial, a block's hash is computed as:</p>
+        <pre><code>block_string = f"{index}{timestamp}{json.dumps(data, sort_keys=True)}{previous_hash}{nonce}"
+hash = hashlib.sha256(block_string.encode()).hexdigest()</code></pre>
+
+        <div class="hint">
+            <strong>Important:</strong> This exact format is used by both the server and your client code. When you implement block hashing in Part 5, make sure your format string matches exactly — including <code>sort_keys=True</code> in the JSON serialization.
+        </div>
+
+        <p>No coding in this step. Make sure you understand how SHA256 works before moving on.</p>
+    </main>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="step1-overview.html">← Previous</a> |
+        <a href="step3-keys.html">Next: ECDSA Key Pairs →</a>
+    </nav>
+</body>
+</html>
