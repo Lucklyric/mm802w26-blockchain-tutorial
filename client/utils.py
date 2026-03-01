@@ -14,7 +14,6 @@ def load_keys(key_file):
     with open(key_file, "r") as f:
         lines = f.read().strip().split("\n")
     sk_hex = lines[0]
-    vk_hex = lines[1]
     sk = SigningKey.from_string(bytes.fromhex(sk_hex), curve=SECP256k1)
     vk = sk.get_verifying_key()
     return sk, vk

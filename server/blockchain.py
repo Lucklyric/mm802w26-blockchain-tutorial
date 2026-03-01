@@ -3,7 +3,7 @@ import threading
 
 from fastapi import HTTPException
 
-from config import CHAIN_FILE, DATA_DIR, DIFFICULTY, LEDGER_FILE
+from config import CHAIN_FILE, DATA_DIR, DIFFICULTY, LEDGER_FILE, TARGET_PREFIX
 from crypto_utils import compute_block_hash, verify_signature
 
 
@@ -40,8 +40,6 @@ class Blockchain:
                 self.ledger = json.load(f)
         else:
             self.ledger = {}
-        for block in self.chain:
-            self._update_ledger_from_block(block)
 
     def save_chain(self):
         with open(CHAIN_FILE, "w") as f:
@@ -51,19 +49,15 @@ class Blockchain:
         with open(LEDGER_FILE, "w") as f:
             json.dump(self.ledger, f, indent=2)
 
-    def _update_ledger_from_block(self, block: dict):
-        data = block["data"]
-        email = data.get("miner_email")
-        pubkey = data.get("miner_pubkey")
-        if email and pubkey and email != "system":
-            if email in self.ledger:
-                self.ledger[email]["status"] = 1
-                self.ledger[email]["block_index"] = block["index"]
+    def _find_email_by_pubkey(self, pubkey: str) -> str | None:
+        for email, entry in self.ledger.items():
+            if entry["pubkey"] == pubkey:
+                return email
+        return None
 
     def register(self, pubkey: str, email: str) -> dict:
-        for entry in self.ledger.values():
-            if entry["pubkey"] == pubkey:
-                raise HTTPException(status_code=400, detail="Public key already registered")
+        if self._find_email_by_pubkey(pubkey):
+            raise HTTPException(status_code=400, detail="Public key already registered")
         if email in self.ledger:
             raise HTTPException(status_code=400, detail="Email already registered")
         self.ledger[email] = {"pubkey": pubkey, "status": 0}
@@ -79,10 +73,6 @@ class Blockchain:
                 raise HTTPException(status_code=400, detail="Invalid previous_hash")
 
             data_dict = block_dict["data"]
-            if isinstance(data_dict, dict):
-                pass
-            else:
-                data_dict = data_dict.dict() if hasattr(data_dict, "dict") else dict(data_dict)
 
             recomputed = compute_block_hash(
                 block_dict["index"],
@@ -94,19 +84,13 @@ class Blockchain:
             if recomputed != block_dict["hash"]:
                 raise HTTPException(status_code=400, detail="Hash mismatch")
 
-            target = "0" * DIFFICULTY
-            if not block_dict["hash"].startswith(target):
+            if not block_dict["hash"].startswith(TARGET_PREFIX):
                 raise HTTPException(status_code=400, detail=f"Hash does not meet difficulty (need {DIFFICULTY} leading zeros)")
 
             pubkey = data_dict["miner_pubkey"]
             email = data_dict["miner_email"]
 
-            registered = False
-            for e, entry in self.ledger.items():
-                if entry["pubkey"] == pubkey:
-                    registered = True
-                    break
-            if not registered:
+            if not self._find_email_by_pubkey(pubkey):
                 raise HTTPException(status_code=400, detail="Miner not registered")
 
             if email not in self.ledger or self.ledger[email]["pubkey"] != pubkey:
@@ -136,7 +120,7 @@ class Blockchain:
         return {
             "chain_length": len(self.chain),
             "difficulty": DIFFICULTY,
-            "target_prefix": "0" * DIFFICULTY,
+            "target_prefix": TARGET_PREFIX,
             "latest_hash": self.chain[-1]["hash"],
             "ledger": self.ledger,
         }
@@ -145,4 +129,4 @@ class Blockchain:
         return self.chain[-1]
 
     def get_difficulty(self) -> dict:
-        return {"difficulty": DIFFICULTY, "target_prefix": "0" * DIFFICULTY}
+        return {"difficulty": DIFFICULTY, "target_prefix": TARGET_PREFIX}
