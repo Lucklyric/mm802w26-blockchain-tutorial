@@ -14,7 +14,7 @@ import hashlib
 import json
 import time
 import requests
-from config import EMAIL, SERVER_URL, KEY_FILE
+from config import EMAIL, STUDENT_RANDOM, INSTRUCTOR_RANDOM, SERVER_URL, KEY_FILE
 from utils import load_keys, pubkey_hex, display_block
 from part4_create_block import create_block
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     print(f"Difficulty: {difficulty} (hash must start with {'0' * difficulty})")
 
     # Create and mine the block
-    block = create_block(SERVER_URL, EMAIL, pub_hex)
+    block = create_block(SERVER_URL, EMAIL, pub_hex, STUDENT_RANDOM, INSTRUCTOR_RANDOM)
     if block is None:
         print("ERROR: create_block() returned None. Fix Part 4 first!")
         exit(1)

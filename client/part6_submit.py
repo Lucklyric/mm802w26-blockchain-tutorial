@@ -11,7 +11,7 @@ import time
 import requests
 from ecdsa import SigningKey, SECP256k1
 from ecdsa.util import sigencode_der
-from config import EMAIL, SERVER_URL, KEY_FILE
+from config import EMAIL, STUDENT_RANDOM, INSTRUCTOR_RANDOM, SERVER_URL, KEY_FILE
 from utils import load_keys, pubkey_hex, display_block
 from part4_create_block import create_block
 from part5_mine import mine_block, compute_block_hash
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     difficulty = diff_info["difficulty"]
 
     # Create block
-    block = create_block(SERVER_URL, EMAIL, pub_hex)
+    block = create_block(SERVER_URL, EMAIL, pub_hex, STUDENT_RANDOM, INSTRUCTOR_RANDOM)
     if block is None:
         print("ERROR: Fix Part 4 first!")
         exit(1)

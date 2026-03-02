@@ -1,7 +1,7 @@
 import hashlib
 import json
 
-from ecdsa import SECP256k1, BadSignatureError, VerifyingKey
+from ecdsa import SECP256k1, BadSignatureError, SigningKey, VerifyingKey
 from ecdsa.util import sigdecode_der
 
 
@@ -14,6 +14,14 @@ def compute_block_hash(index: int, timestamp: float, data_dict: dict, previous_h
     sorted_data = json.dumps(data_dict, sort_keys=True)
     block_string = f"{index}{timestamp}{sorted_data}{previous_hash}{nonce}"
     return hashlib.sha256(block_string.encode()).hexdigest()
+
+
+def derive_pubkey_hex(email: str, student_random: list[int], instructor_random: list[int]) -> str:
+    """Re-derive the public key from seed components (email + randoms)."""
+    seed_string = email + str(student_random) + str(instructor_random)
+    seed_bytes = hashlib.sha256(seed_string.encode()).digest()
+    sk = SigningKey.from_string(seed_bytes, curve=SECP256k1)
+    return sk.get_verifying_key().to_string().hex()
 
 
 def verify_signature(pubkey_hex: str, signature_hex: str, message: str) -> bool:

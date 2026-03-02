@@ -4,12 +4,9 @@ from pydantic import BaseModel
 class BlockData(BaseModel):
     miner_pubkey: str
     miner_email: str
+    student_random: list[int]
+    instructor_random: list[int]
     action: str
-
-
-class RegisterRequest(BaseModel):
-    pubkey: str
-    email: str
 
 
 class MineRequest(BaseModel):

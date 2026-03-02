@@ -77,7 +77,7 @@ if __name__ == "__main__":
         print(f"Chain length: {status.get('chain_length')}")
         print(f"Difficulty: {status.get('difficulty')}")
         print(f"Latest hash: {status.get('latest_hash', '')[:20]}...")
-        print(f"Registered miners: {len(status.get('ledger', {}))}")
+        print(f"Completed miners: {len(status.get('ledger', {}))}")
 
     print("\n--- Latest Block ---")
     latest = get_latest_block(SERVER_URL)

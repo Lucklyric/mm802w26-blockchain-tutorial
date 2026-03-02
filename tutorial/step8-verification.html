@@ -23,7 +23,7 @@
             <li><strong>Previous hash</strong> — Must match the latest block's hash</li>
             <li><strong>Hash validity</strong> — Recomputed hash must match the submitted hash</li>
             <li><strong>Proof of Work</strong> — Hash must start with the required number of zeros</li>
-            <li><strong>Registration</strong> — Your public key must be registered</li>
+            <li><strong>Key derivation</strong> — Your public key must match the seed (email + randoms)</li>
             <li><strong>Not already mined</strong> — Your status must be 0 (not already completed)</li>
             <li><strong>Correct action</strong> — Must be "set_done"</li>
             <li><strong>Valid signature</strong> — ECDSA signature must verify</li>
@@ -71,7 +71,7 @@ SUCCESS! Your block is on the chain. Status: DONE</code></pre>
             <strong>Congratulations!</strong> You've successfully:
             <ul>
                 <li>Generated an ECDSA key pair from a deterministic seed</li>
-                <li>Registered your identity on a blockchain</li>
+                <li>Proved your identity through key derivation</li>
                 <li>Constructed and mined a block using Proof of Work</li>
                 <li>Signed and submitted your block with a digital signature</li>
             </ul>

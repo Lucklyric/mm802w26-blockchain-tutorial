@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from blockchain import Blockchain
-from models import MineRequest, RegisterRequest
+from models import MineRequest
 
 app = FastAPI(title="Blockchain Tutorial Server")
 
@@ -54,11 +54,6 @@ def get_block(index: int):
 @app.get("/difficulty")
 def get_difficulty():
     return bc.get_difficulty()
-
-
-@app.post("/register")
-def register(request: RegisterRequest):
-    return bc.register(request.pubkey, request.email)
 
 
 @app.post("/mine")

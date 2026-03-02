@@ -4,7 +4,7 @@ import threading
 from fastapi import HTTPException
 
 from config import CHAIN_FILE, DATA_DIR, DIFFICULTY, LEDGER_FILE, TARGET_PREFIX
-from crypto_utils import compute_block_hash, verify_signature
+from crypto_utils import compute_block_hash, derive_pubkey_hex, verify_signature
 
 
 class Blockchain:
@@ -16,7 +16,13 @@ class Blockchain:
         self.load_chain()
 
     def _create_genesis_block(self) -> dict:
-        data = {"miner_pubkey": "genesis", "miner_email": "system", "action": "genesis"}
+        data = {
+            "miner_pubkey": "genesis",
+            "miner_email": "system",
+            "student_random": [],
+            "instructor_random": [],
+            "action": "genesis",
+        }
         genesis = {
             "index": 0,
             "timestamp": 0.0,
@@ -49,21 +55,6 @@ class Blockchain:
         with open(LEDGER_FILE, "w") as f:
             json.dump(self.ledger, f, indent=2)
 
-    def _find_email_by_pubkey(self, pubkey: str) -> str | None:
-        for email, entry in self.ledger.items():
-            if entry["pubkey"] == pubkey:
-                return email
-        return None
-
-    def register(self, pubkey: str, email: str) -> dict:
-        if self._find_email_by_pubkey(pubkey):
-            raise HTTPException(status_code=400, detail="Public key already registered")
-        if email in self.ledger:
-            raise HTTPException(status_code=400, detail="Email already registered")
-        self.ledger[email] = {"pubkey": pubkey, "status": 0}
-        self.save_ledger()
-        return {"success": True, "message": f"Registered {email}"}
-
     def submit_block(self, block_dict: dict) -> dict:
         with self.lock:
             if block_dict["index"] != len(self.chain):
@@ -89,14 +80,15 @@ class Blockchain:
 
             pubkey = data_dict["miner_pubkey"]
             email = data_dict["miner_email"]
+            student_random = data_dict["student_random"]
+            instructor_random = data_dict["instructor_random"]
 
-            if not self._find_email_by_pubkey(pubkey):
-                raise HTTPException(status_code=400, detail="Miner not registered")
+            # Re-derive public key from plaintext seed components and verify it matches
+            expected_pubkey = derive_pubkey_hex(email, student_random, instructor_random)
+            if pubkey != expected_pubkey:
+                raise HTTPException(status_code=400, detail="Public key does not match seed (email + randoms)")
 
-            if email not in self.ledger or self.ledger[email]["pubkey"] != pubkey:
-                raise HTTPException(status_code=400, detail="Email/pubkey mismatch")
-
-            if self.ledger[email]["status"] == 1:
+            if email in self.ledger and self.ledger[email].get("status") == 1:
                 raise HTTPException(status_code=400, detail="Miner already completed")
 
             if data_dict["action"] != "set_done":
@@ -106,8 +98,13 @@ class Blockchain:
                 raise HTTPException(status_code=400, detail="Invalid signature")
 
             self.chain.append(block_dict)
-            self.ledger[email]["status"] = 1
-            self.ledger[email]["block_index"] = block_dict["index"]
+            self.ledger[email] = {
+                "pubkey": pubkey,
+                "student_random": student_random,
+                "instructor_random": instructor_random,
+                "status": 1,
+                "block_index": block_dict["index"],
+            }
             self.save_chain()
             self.save_ledger()
 
