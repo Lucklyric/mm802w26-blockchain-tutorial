@@ -1,0 +1,3 @@
+[submodule "assignment-student"]
+	path = assignment-student
+	url = git@github.com:Lucklyric/mm802w26-blockchain-tutorial-student.git
