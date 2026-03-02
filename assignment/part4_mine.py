@@ -1,5 +1,5 @@
 """
-Part 5: Mining (Proof of Work)
+Part 4: Mining (Proof of Work)
 ===============================
 Find a nonce that makes the block hash start with the required number of zeros.
 
@@ -8,7 +8,7 @@ This is the core of Proof of Work: brute-force search for a valid nonce.
 The hash is computed as:
     SHA256(f"{index}{timestamp}{json.dumps(data, sort_keys=True)}{previous_hash}{nonce}")
 
-Run: uv run python part5_mine.py
+Run: uv run python part4_mine.py
 """
 import hashlib
 import json
@@ -16,7 +16,7 @@ import time
 import requests
 from config import EMAIL, STUDENT_RANDOM, INSTRUCTOR_RANDOM, SERVER_URL, KEY_FILE
 from utils import load_keys, pubkey_hex, display_block
-from part4_create_block import create_block
+from part3_create_block import create_block
 
 
 def compute_block_hash(block):
@@ -100,4 +100,4 @@ if __name__ == "__main__":
     print(f"Nonce: {mined['nonce']}")
     print(f"Hash: {mined['hash']}")
     display_block(mined)
-    print("\nProceed to Part 6 to sign and submit!")
+    print("\nProceed to Part 5 to sign and submit!")

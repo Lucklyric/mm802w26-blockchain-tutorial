@@ -1,9 +1,9 @@
 """
-Part 4: Creating a Block
+Part 3: Creating a Block
 =========================
 Construct a valid block structure that's ready for mining.
 
-Run: uv run python part4_create_block.py
+Run: uv run python part3_create_block.py
 """
 import time
 import requests
@@ -69,4 +69,4 @@ if __name__ == "__main__":
     print("Block created:")
     display_block(block)
     print("\nNote: nonce, hash, and signature are placeholders.")
-    print("Proceed to Part 5 to mine the block!")
+    print("Proceed to Part 4 to mine the block!")

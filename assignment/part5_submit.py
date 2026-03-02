@@ -1,9 +1,9 @@
 """
-Part 6: Signing and Submitting
+Part 5: Signing and Submitting
 ===============================
 Sign your mined block and submit it to the blockchain.
 
-Run: uv run python part6_submit.py
+Run: uv run python part5_submit.py
 """
 import hashlib
 import json
@@ -13,8 +13,8 @@ from ecdsa import SigningKey, SECP256k1
 from ecdsa.util import sigencode_der
 from config import EMAIL, STUDENT_RANDOM, INSTRUCTOR_RANDOM, SERVER_URL, KEY_FILE
 from utils import load_keys, pubkey_hex, display_block
-from part4_create_block import create_block
-from part5_mine import mine_block, compute_block_hash
+from part3_create_block import create_block
+from part4_mine import mine_block, compute_block_hash
 
 
 def sign_block(signing_key, block_hash):

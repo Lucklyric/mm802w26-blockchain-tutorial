@@ -330,9 +330,9 @@ SERVER_URL = <span class="str">"http://&lt;server-ip&gt;"</span>      <span clas
         </table>
 
         <div class="exercise">
-          <div class="exercise-label">Exercise: Part 3</div>
+          <div class="exercise-label">Exercise: Part 2</div>
           <h4>Explore the Chain</h4>
-          <p>Open <code>assignment/part3_explore.py</code> and implement four GET functions:</p>
+          <p>Open <code>assignment/part2_explore.py</code> and implement four GET functions:</p>
           <ul>
             <li><code>get_chain(server_url)</code> &mdash; GET <code>/chain</code></li>
             <li><code>get_status(server_url)</code> &mdash; GET <code>/status</code></li>
@@ -348,7 +348,7 @@ SERVER_URL = <span class="str">"http://&lt;server-ip&gt;"</span>      <span clas
           <div class="verification">
             <div class="verification-label">Verification</div>
 <pre data-lang="bash"><code>cd assignment
-uv run python part3_explore.py</code></pre>
+uv run python part2_explore.py</code></pre>
           </div>
 
           <h4>What to Look For</h4>
@@ -384,9 +384,9 @@ nonce = 47231 -&gt; hash = "0000a8..."  FOUND IT!</code></pre>
         </div>
 
         <div class="exercise">
-          <div class="exercise-label">Exercise: Part 4</div>
+          <div class="exercise-label">Exercise: Part 3</div>
           <h4>Create a Block</h4>
-          <p>Open <code>assignment/part4_create_block.py</code> and implement:</p>
+          <p>Open <code>assignment/part3_create_block.py</code> and implement:</p>
 
           <p><strong><code>create_block(server_url, email, public_key_hex)</code></strong>:</p>
           <ol>
@@ -407,14 +407,14 @@ nonce = 47231 -&gt; hash = "0000a8..."  FOUND IT!</code></pre>
           <div class="verification">
             <div class="verification-label">Verification</div>
 <pre data-lang="bash"><code>cd assignment
-uv run python part4_create_block.py</code></pre>
+uv run python part3_create_block.py</code></pre>
           </div>
         </div>
 
         <div class="exercise">
-          <div class="exercise-label">Exercise: Part 5</div>
+          <div class="exercise-label">Exercise: Part 4</div>
           <h4>Mine the Block</h4>
-          <p>Open <code>assignment/part5_mine.py</code> and implement:</p>
+          <p>Open <code>assignment/part4_mine.py</code> and implement:</p>
 
           <p><strong><code>compute_block_hash(block)</code></strong> &mdash; Build the block string from all fields and return the SHA256 hexdigest.</p>
 
@@ -423,7 +423,7 @@ uv run python part4_create_block.py</code></pre>
           <div class="verification">
             <div class="verification-label">Verification</div>
 <pre data-lang="bash"><code>cd assignment
-uv run python part5_mine.py</code></pre>
+uv run python part4_mine.py</code></pre>
           </div>
 
           <div class="callout hint">
@@ -454,9 +454,9 @@ uv run python part5_mine.py</code></pre>
     Signature (hex)</code></pre>
 
         <div class="exercise">
-          <div class="exercise-label">Exercise: Part 6 &mdash; Signing</div>
+          <div class="exercise-label">Exercise: Part 5 &mdash; Signing</div>
           <h4>Sign Your Block</h4>
-          <p>In <code>assignment/part6_submit.py</code>, implement:</p>
+          <p>In <code>assignment/part5_submit.py</code>, implement:</p>
 
           <p><strong><code>sign_block(signing_key, block_hash)</code></strong>:</p>
           <ol>
@@ -477,7 +477,7 @@ uv run python part5_mine.py</code></pre>
         </div>
 
         <div class="exercise">
-          <div class="exercise-label">Exercise: Part 6 &mdash; Submitting</div>
+          <div class="exercise-label">Exercise: Part 5 &mdash; Submitting</div>
           <h4>Submit to the Server</h4>
           <p><strong><code>submit_block(server_url, block)</code></strong>:</p>
           <ol>
@@ -502,7 +502,7 @@ uv run python part5_mine.py</code></pre>
         <div class="verification">
           <div class="verification-label">Run the Final Submission</div>
 <pre data-lang="bash"><code>cd assignment
-uv run python part6_submit.py</code></pre>
+uv run python part5_submit.py</code></pre>
         </div>
 
         <h3>Expected Output</h3>

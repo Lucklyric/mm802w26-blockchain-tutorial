@@ -1,9 +1,9 @@
 """
-Part 3: Exploring the Blockchain
+Part 2: Exploring the Blockchain
 =================================
 Read the current state of the blockchain using the server's REST API.
 
-Run: uv run python part3_explore.py
+Run: uv run python part2_explore.py
 """
 import requests
 from config import SERVER_URL
@@ -94,4 +94,4 @@ if __name__ == "__main__":
         print(f"Difficulty: {diff.get('difficulty')}")
         print(f"Target prefix: {diff.get('target_prefix')}")
 
-    print("\nDone! Proceed to Part 4.")
+    print("\nDone! Proceed to Part 3.")
