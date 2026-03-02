@@ -83,16 +83,16 @@ class Blockchain:
             student_random = data_dict["student_random"]
             instructor_random = data_dict["instructor_random"]
 
-            # Re-derive public key from plaintext seed components and verify it matches
-            expected_pubkey = derive_pubkey_hex(email, student_random, instructor_random)
-            if pubkey != expected_pubkey:
-                raise HTTPException(status_code=400, detail="Public key does not match seed (email + randoms)")
-
             if email in self.ledger and self.ledger[email].get("status") == 1:
                 raise HTTPException(status_code=400, detail="Miner already completed")
 
             if data_dict["action"] != "set_done":
                 raise HTTPException(status_code=400, detail="Invalid action. Must be 'set_done'")
+
+            # Re-derive public key from plaintext seed components and verify it matches
+            expected_pubkey = derive_pubkey_hex(email, student_random, instructor_random)
+            if pubkey != expected_pubkey:
+                raise HTTPException(status_code=400, detail="Public key does not match seed (email + randoms)")
 
             if not verify_signature(pubkey, block_dict["signature"], block_dict["hash"]):
                 raise HTTPException(status_code=400, detail="Invalid signature")

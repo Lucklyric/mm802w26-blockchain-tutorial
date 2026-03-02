@@ -2,6 +2,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from blockchain import Blockchain
@@ -19,16 +20,16 @@ app.add_middleware(
 
 bc = Blockchain()
 
-tutorial_dir = Path(__file__).parent / "tutorial"
+tutorial_dir = Path(__file__).parent.parent / "tutorial"
 if not tutorial_dir.exists():
-    tutorial_dir = Path(__file__).parent.parent / "tutorial"
+    tutorial_dir = Path(__file__).parent / "tutorial"
 if tutorial_dir.exists():
     app.mount("/tutorial", StaticFiles(directory=str(tutorial_dir), html=True), name="tutorial")
 
 
 @app.get("/")
 def root():
-    return {"message": "Blockchain Tutorial Server", "docs": "/docs"}
+    return RedirectResponse(url="/tutorial/")
 
 
 @app.get("/chain")

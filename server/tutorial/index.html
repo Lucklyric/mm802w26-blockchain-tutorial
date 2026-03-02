@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blockchain Tutorial — CMPUT 802</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- Mobile Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="layout">
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="chain-icon">
+        <div class="link"></div>
+        <div class="link"></div>
+        <div class="link"></div>
+      </div>
+      <h1>
+        Blockchain Tutorial
+        <span>CMPUT 802</span>
+      </h1>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <a href="#step1" data-step="step1">
+        <span class="step-num">01</span> What is a Blockchain?
+      </a>
+      <a href="#step2" data-step="step2">
+        <span class="step-num">02</span> SHA256 and Hashing
+      </a>
+      <a href="#step3" data-step="step3">
+        <span class="step-num">03</span> ECDSA Key Pairs
+      </a>
+      <a href="#step4" data-step="step4">
+        <span class="step-num">04</span> Random Numbers
+      </a>
+      <a href="#step5" data-step="step5">
+        <span class="step-num">05</span> Reading the Chain
+      </a>
+      <a href="#step6" data-step="step6">
+        <span class="step-num">06</span> Proof of Work
+      </a>
+      <a href="#step7" data-step="step7">
+        <span class="step-num">07</span> Signatures &amp; Submit
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/tutorial/explorer.html">
+        Chain Explorer <span class="arrow">&rarr;</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="content">
+    <div class="content-inner">
+
+      <!-- Page Header -->
+      <header class="page-header">
+        <h1>Blockchain Tutorial &mdash; CMPUT 802</h1>
+        <p class="subtitle">Build a blockchain client from scratch: keys, hashing, mining, and digital signatures.</p>
+        <div class="hash-decoration">sha256: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069</div>
+      </header>
+
+      <!-- ==================== STEP 1 ==================== -->
+      <section class="section" id="step1">
+        <span class="section-anchor" id="step1-anchor"></span>
+        <div class="step-label">Step 1</div>
+        <h2>What is a Blockchain?</h2>
+
+        <p>A blockchain is a <strong>linked list of blocks</strong> where each block contains a cryptographic hash of the previous block. This creates a tamper-evident chain &mdash; changing any block invalidates all subsequent blocks.</p>
+
+        <h3>Block Structure</h3>
+        <p>Each block contains:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>index</code></td>
+              <td>Block number (0 for genesis, 1, 2, ...)</td>
+            </tr>
+            <tr>
+              <td><code>timestamp</code></td>
+              <td>When the block was created</td>
+            </tr>
+            <tr>
+              <td><code>data</code></td>
+              <td>Miner&rsquo;s public key, email, and action</td>
+            </tr>
+            <tr>
+              <td><code>previous_hash</code></td>
+              <td>Hash of the previous block</td>
+            </tr>
+            <tr>
+              <td><code>nonce</code></td>
+              <td>Number found during mining (Proof of Work)</td>
+            </tr>
+            <tr>
+              <td><code>hash</code></td>
+              <td>This block&rsquo;s hash (depends on all fields above)</td>
+            </tr>
+            <tr>
+              <td><code>signature</code></td>
+              <td>Miner&rsquo;s digital signature</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>How Blocks Link Together</h3>
+<pre class="ascii-art"><code>+----------------+     +----------------+     +----------------+
+|  Block 0       |     |  Block 1       |     |  Block 2       |
+|  (Genesis)     |     |                |     |                |
+|                |     |                |     |                |
+| prev: 000...   |     | prev: a4f...   |     | prev: 7c2...   |
+| hash: a4f...   |----&gt;| hash: 7c2...   |----&gt;| hash: 0e1...   |
++----------------+     +----------------+     +----------------+</code></pre>
+
+        <h3>Key Properties</h3>
+        <ul>
+          <li><strong>Immutability</strong> &mdash; Changing a block changes its hash, which breaks the chain link.</li>
+          <li><strong>Transparency</strong> &mdash; Anyone can read the entire chain and verify every block.</li>
+          <li><strong>Proof of Work</strong> &mdash; Mining requires computational effort, preventing spam.</li>
+        </ul>
+
+        <div class="callout hint">
+          <div class="callout-label">&#x1F4A1; Hint</div>
+          <p>Our tutorial uses a single centralized server for simplicity. Real blockchains like Bitcoin use thousands of nodes that reach consensus. The cryptographic concepts are the same.</p>
+        </div>
+      </section>
+
+      <!-- ==================== STEP 2 ==================== -->
+      <section class="section" id="step2">
+        <span class="section-anchor" id="step2-anchor"></span>
+        <div class="step-label">Step 2</div>
+        <h2>SHA256 and Hashing</h2>
+
+        <p>Cryptographic hash functions are the backbone of blockchain security. We use <strong>SHA256</strong> for everything in this tutorial.</p>
+
+        <h3>Properties of SHA256</h3>
+        <ul>
+          <li><strong>Deterministic</strong> &mdash; Same input always produces the same output</li>
+          <li><strong>One-way</strong> &mdash; Cannot reverse a hash to find the input</li>
+          <li><strong>Fixed-size output</strong> &mdash; SHA256 always produces 256 bits (64 hex characters)</li>
+          <li><strong>Avalanche effect</strong> &mdash; A tiny change in input completely changes the output</li>
+        </ul>
+
+        <h3>Try It Yourself</h3>
+<pre data-lang="python"><code><span class="kw">import</span> hashlib
+
+<span class="cmt"># Hash a simple string</span>
+h1 = hashlib.sha256(<span class="str">b"hello"</span>).hexdigest()
+<span class="fn">print</span>(h1)  <span class="cmt"># 2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824</span>
+
+<span class="cmt"># Change one character — completely different hash</span>
+h2 = hashlib.sha256(<span class="str">b"Hello"</span>).hexdigest()
+<span class="fn">print</span>(h2)  <span class="cmt"># 185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969</span></code></pre>
+
+        <h3>Role in Blockchain</h3>
+        <p>SHA256 is used in three critical ways:</p>
+        <ol>
+          <li><strong>Key generation</strong> &mdash; email + random numbers hashed to create a deterministic seed</li>
+          <li><strong>Block hashing</strong> &mdash; All block fields combined and hashed</li>
+          <li><strong>Proof of Work</strong> &mdash; Search for nonce that makes hash start with zeros</li>
+        </ol>
+
+        <h4>Block Hash Format</h4>
+<pre data-lang="python"><code>block_string = <span class="str">f"</span>{index}{timestamp}{json.dumps(data, sort_keys=<span class="kw">True</span>)}{previous_hash}{nonce}<span class="str">"</span>
+hash = hashlib.sha256(block_string.encode()).hexdigest()</code></pre>
+
+        <div class="callout hint">
+          <div class="callout-label">&#x1F4A1; Hint</div>
+          <p>This exact format is used by both the server and your client code. When you implement block hashing, make sure your format string matches exactly &mdash; including <code>sort_keys=True</code>.</p>
+        </div>
+      </section>
+
+      <!-- ==================== STEP 3 ==================== -->
+      <section class="section" id="step3">
+        <span class="section-anchor" id="step3-anchor"></span>
+        <div class="step-label">Step 3</div>
+        <h2>ECDSA Key Pairs</h2>
+
+        <p>Public-key cryptography lets you <strong>prove your identity</strong> without sharing a secret.</p>
+
+        <h3>How It Works</h3>
+        <ul>
+          <li><strong>Private key (SigningKey)</strong> &mdash; A 32-byte secret number. Used to sign data.</li>
+          <li><strong>Public key (VerifyingKey)</strong> &mdash; Derived from the private key. Used to verify signatures.</li>
+          <li><strong>ECDSA</strong> &mdash; Elliptic Curve Digital Signature Algorithm</li>
+          <li><strong>secp256k1</strong> &mdash; The specific curve used by Bitcoin (and this tutorial)</li>
+        </ul>
+
+        <h3>Key Generation Process</h3>
+<pre class="ascii-art"><code>email + student_random + instructor_random
+                  |
+                  v
+          +---------------+
+          |   SHA256       |
+          |   (32 bytes)   |
+          +-------+-------+
+                  | seed
+                  v
+          +---------------+
+          |  SigningKey    |---- Private Key (keep secret!)
+          |  (secp256k1)  |
+          +-------+-------+
+                  |
+                  v
+          +---------------+
+          | VerifyingKey  |---- Public Key (share freely)
+          +---------------+</code></pre>
+
+        <div class="exercise">
+          <div class="exercise-label">Exercise: Part 1</div>
+          <h4>Key Generation</h4>
+          <p>Open <code>assignment/part1_keygen.py</code> and implement:</p>
+
+          <p><strong><code>generate_seed()</code></strong>:</p>
+          <ol>
+            <li>Concatenate: <code>EMAIL + str(STUDENT_RANDOM) + str(INSTRUCTOR_RANDOM)</code></li>
+            <li>Hash with SHA256</li>
+            <li>Return the raw bytes (<code>.digest()</code>, not <code>.hexdigest()</code>)</li>
+          </ol>
+
+          <p><strong><code>generate_keypair(seed_bytes)</code></strong>:</p>
+          <ol>
+            <li>Create a <code>SigningKey</code> from the seed bytes using <code>SECP256k1</code></li>
+            <li>Get the <code>VerifyingKey</code> from the signing key</li>
+            <li>Return both as a tuple</li>
+          </ol>
+
+          <div class="callout hint">
+            <div class="callout-label">&#x1F4A1; Hint</div>
+            <p>The seed is exactly 32 bytes (SHA256 output), which is the right size for a secp256k1 private key.</p>
+          </div>
+
+          <div class="verification">
+            <div class="verification-label">Verification</div>
+<pre data-lang="bash"><code>cd assignment
+uv run python part1_keygen.py</code></pre>
+          </div>
+
+          <div class="callout warning">
+            <div class="callout-label">&#x26A0; Warning</div>
+            <p>Keep your <code>.keys</code> file safe! The keys are deterministic (same email + randoms = same keys), so you can always regenerate them.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== STEP 4 ==================== -->
+      <section class="section" id="step4">
+        <span class="section-anchor" id="step4-anchor"></span>
+        <div class="step-label">Step 4</div>
+        <h2>Random Numbers</h2>
+
+        <p>Your unique blockchain identity is derived from three components:</p>
+        <ul>
+          <li>Your <strong>email address</strong> (e.g., <code>yourname@ualberta.ca</code>)</li>
+          <li>Your <strong>student random numbers</strong> &mdash; numbers you choose yourself (3&ndash;5 integers)</li>
+          <li>The <strong>instructor random numbers</strong> &mdash; announced in class</li>
+        </ul>
+        <p>These combine to create a deterministic seed for your cryptographic key pair.</p>
+
+        <h3>Instructor Random Numbers</h3>
+        <div class="sheets-placeholder">
+          <p><strong>Instructor Random Numbers</strong></p>
+          <p>The instructor random numbers will be shared via Google Sheets during class. Check the link provided by your instructor.</p>
+          <!-- Replace with: <iframe src="YOUR_GOOGLE_SHEETS_URL" width="100%" height="300" frameborder="0"></iframe> -->
+        </div>
+
+        <h3>Setup</h3>
+        <p>Edit <code>assignment/config.py</code> with your details:</p>
+<pre data-lang="python"><code>EMAIL = <span class="str">"yourname@ualberta.ca"</span>
+STUDENT_RANDOM = [<span class="num">42</span>, <span class="num">7</span>, <span class="num">13</span>]          <span class="cmt"># Your choice</span>
+INSTRUCTOR_RANDOM = [<span class="num">802</span>, <span class="num">2026</span>, <span class="num">1</span>]    <span class="cmt"># From class</span>
+SERVER_URL = <span class="str">"http://&lt;server-ip&gt;"</span>      <span class="cmt"># Provided by instructor</span></code></pre>
+      </section>
+
+      <!-- ==================== STEP 5 ==================== -->
+      <section class="section" id="step5">
+        <span class="section-anchor" id="step5-anchor"></span>
+        <div class="step-label">Step 5</div>
+        <h2>Reading the Chain</h2>
+
+        <p>The blockchain server exposes GET endpoints for reading chain data:</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Returns</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>GET /chain</code></td>
+              <td>Full blockchain (list of all blocks)</td>
+            </tr>
+            <tr>
+              <td><code>GET /status</code></td>
+              <td>Chain length, difficulty, latest hash, ledger</td>
+            </tr>
+            <tr>
+              <td><code>GET /latest</code></td>
+              <td>Most recent block</td>
+            </tr>
+            <tr>
+              <td><code>GET /difficulty</code></td>
+              <td>Current difficulty and target prefix</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="exercise">
+          <div class="exercise-label">Exercise: Part 3</div>
+          <h4>Explore the Chain</h4>
+          <p>Open <code>assignment/part3_explore.py</code> and implement four GET functions:</p>
+          <ul>
+            <li><code>get_chain(server_url)</code> &mdash; GET <code>/chain</code></li>
+            <li><code>get_status(server_url)</code> &mdash; GET <code>/status</code></li>
+            <li><code>get_latest_block(server_url)</code> &mdash; GET <code>/latest</code></li>
+            <li><code>get_difficulty(server_url)</code> &mdash; GET <code>/difficulty</code></li>
+          </ul>
+
+          <div class="callout hint">
+            <div class="callout-label">&#x1F4A1; Hint</div>
+            <p>Each function is a single <code>requests.get()</code> call followed by <code>.json()</code>. Very straightforward!</p>
+          </div>
+
+          <div class="verification">
+            <div class="verification-label">Verification</div>
+<pre data-lang="bash"><code>cd assignment
+uv run python part3_explore.py</code></pre>
+          </div>
+
+          <h4>What to Look For</h4>
+          <ul>
+            <li><code>index</code> &mdash; Your block will be index + 1</li>
+            <li><code>hash</code> &mdash; Your block&rsquo;s <code>previous_hash</code> will be this value</li>
+          </ul>
+        </div>
+
+        <p>Want to explore the chain visually? Open the <a href="/tutorial/explorer.html">Chain Explorer</a>.</p>
+      </section>
+
+      <!-- ==================== STEP 6 ==================== -->
+      <section class="section" id="step6">
+        <span class="section-anchor" id="step6-anchor"></span>
+        <div class="step-label">Step 6</div>
+        <h2>Proof of Work</h2>
+
+        <p>Proof of Work requires finding a <strong>nonce</strong> that makes the block hash start with a certain number of zeros.</p>
+
+        <h3>How Mining Works</h3>
+<pre class="ascii-art"><code>nonce = 0     -&gt; hash = "8a3f1b..."  (doesn't start with 0000)
+nonce = 1     -&gt; hash = "f29c04..."
+nonce = 2     -&gt; hash = "12ab9e..."
+...
+nonce = 47231 -&gt; hash = "0000a8..."  FOUND IT!</code></pre>
+
+        <p>With difficulty 4, the hash must start with <code>0000</code>. This takes roughly ~65,536 tries on average, typically 0.5 to 5 seconds on modern hardware.</p>
+
+        <div class="callout warning">
+          <div class="callout-label">&#x26A0; Warning</div>
+          <p>The server uses this exact same format to verify your block. If your format differs even slightly, your hash won&rsquo;t match.</p>
+        </div>
+
+        <div class="exercise">
+          <div class="exercise-label">Exercise: Part 4</div>
+          <h4>Create a Block</h4>
+          <p>Open <code>assignment/part4_create_block.py</code> and implement:</p>
+
+          <p><strong><code>create_block(server_url, email, public_key_hex)</code></strong>:</p>
+          <ol>
+            <li>Fetch the latest block from <code>/latest</code></li>
+            <li>Build a block dict with:
+              <ul>
+                <li><code>index</code> &mdash; latest block&rsquo;s index + 1</li>
+                <li><code>timestamp</code> &mdash; current time</li>
+                <li><code>data</code> &mdash; miner pubkey, email, and action</li>
+                <li><code>previous_hash</code> &mdash; latest block&rsquo;s hash</li>
+                <li><code>nonce</code> &mdash; 0 (placeholder)</li>
+                <li><code>hash</code> &mdash; "" (placeholder)</li>
+                <li><code>signature</code> &mdash; "" (placeholder)</li>
+              </ul>
+            </li>
+          </ol>
+
+          <div class="verification">
+            <div class="verification-label">Verification</div>
+<pre data-lang="bash"><code>cd assignment
+uv run python part4_create_block.py</code></pre>
+          </div>
+        </div>
+
+        <div class="exercise">
+          <div class="exercise-label">Exercise: Part 5</div>
+          <h4>Mine the Block</h4>
+          <p>Open <code>assignment/part5_mine.py</code> and implement:</p>
+
+          <p><strong><code>compute_block_hash(block)</code></strong> &mdash; Build the block string from all fields and return the SHA256 hexdigest.</p>
+
+          <p><strong><code>mine_block(block, difficulty)</code></strong> &mdash; Iterate nonces starting from 0 until the hash starts with <code>"0" * difficulty</code>.</p>
+
+          <div class="verification">
+            <div class="verification-label">Verification</div>
+<pre data-lang="bash"><code>cd assignment
+uv run python part5_mine.py</code></pre>
+          </div>
+
+          <div class="callout hint">
+            <div class="callout-label">&#x1F4A1; Hint</div>
+            <p>If mining takes more than 30 seconds, double-check your hash format string.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== STEP 7 ==================== -->
+      <section class="section" id="step7">
+        <span class="section-anchor" id="step7-anchor"></span>
+        <div class="step-label">Step 7</div>
+        <h2>Digital Signatures &amp; Submit</h2>
+
+        <p>Digital signatures prove <strong>you</strong> mined the block without revealing your private key.</p>
+
+        <h3>Signing Process</h3>
+<pre class="ascii-art"><code>Block Hash (string)
+      |
+      v
++-------------------+
+| ECDSA Sign        |&lt;---- Your Private Key
+| (SHA256 + DER)    |
++---------+---------+
+          |
+          v
+    Signature (hex)</code></pre>
+
+        <div class="exercise">
+          <div class="exercise-label">Exercise: Part 6 &mdash; Signing</div>
+          <h4>Sign Your Block</h4>
+          <p>In <code>assignment/part6_submit.py</code>, implement:</p>
+
+          <p><strong><code>sign_block(signing_key, block_hash)</code></strong>:</p>
+          <ol>
+            <li>Sign <code>block_hash.encode()</code> using the signing key</li>
+            <li>Use SHA256 as the hash function and DER encoding (<code>sigencode_der</code>)</li>
+            <li>Return the signature as a hex string</li>
+          </ol>
+
+          <div class="callout hint">
+            <div class="callout-label">&#x1F4A1; Hint</div>
+<pre data-lang="python"><code>signature = signing_key.sign(
+    block_hash.encode(),
+    hashfunc=hashlib.sha256,
+    sigencode=sigencode_der
+)
+<span class="kw">return</span> signature.hex()</code></pre>
+          </div>
+        </div>
+
+        <div class="exercise">
+          <div class="exercise-label">Exercise: Part 6 &mdash; Submitting</div>
+          <h4>Submit to the Server</h4>
+          <p><strong><code>submit_block(server_url, block)</code></strong>:</p>
+          <ol>
+            <li>POST to <code>{server_url}/mine</code> with the block as the JSON body</li>
+            <li>Return the server&rsquo;s JSON response</li>
+          </ol>
+        </div>
+
+        <h3>Server Validation</h3>
+        <p>The server validates your submission in this order:</p>
+        <ol>
+          <li>Block index matches expected next index</li>
+          <li>Previous hash matches latest block&rsquo;s hash</li>
+          <li>Hash is valid (recomputed from fields)</li>
+          <li>Proof of Work passes (leading zeros)</li>
+          <li>Key derivation is correct (pubkey matches seed)</li>
+          <li>Email has not already completed the assignment</li>
+          <li>Action is <code>"set_done"</code></li>
+          <li>Valid ECDSA signature</li>
+        </ol>
+
+        <div class="verification">
+          <div class="verification-label">Run the Final Submission</div>
+<pre data-lang="bash"><code>cd assignment
+uv run python part6_submit.py</code></pre>
+        </div>
+
+        <h3>Expected Output</h3>
+<pre data-lang="output"><code>Server response: {'success': True, 'message': 'Block N added by you@ualberta.ca'}</code></pre>
+
+        <h3>Handling Errors</h3>
+        <p>If your submission is rejected, check these common issues:</p>
+        <table class="error-table">
+          <thead>
+            <tr>
+              <th>Error</th>
+              <th>Solution</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Invalid index</code></td>
+              <td>Someone mined before you. Re-fetch <code>/latest</code> and rebuild your block.</td>
+            </tr>
+            <tr>
+              <td><code>Invalid previous_hash</code></td>
+              <td>Chain has changed. Fetch the latest block again.</td>
+            </tr>
+            <tr>
+              <td><code>Invalid hash</code></td>
+              <td>Your hash format string doesn&rsquo;t match the server&rsquo;s. Check <code>sort_keys=True</code>.</td>
+            </tr>
+            <tr>
+              <td><code>PoW failed</code></td>
+              <td>Hash doesn&rsquo;t start with enough zeros. Re-mine with correct difficulty.</td>
+            </tr>
+            <tr>
+              <td><code>Invalid signature</code></td>
+              <td>Make sure you&rsquo;re signing <code>block_hash.encode()</code> with DER encoding.</td>
+            </tr>
+            <tr>
+              <td><code>Already completed</code></td>
+              <td>You already submitted successfully. You&rsquo;re done!</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout success">
+          <div class="callout-label">&#x2705; Congratulations!</div>
+          <p>If you see <code>{'success': True, ...}</code>, you have successfully mined and submitted a block to the blockchain. Your block is now permanently part of the chain and can be verified by anyone.</p>
+          <p>Open the <a href="/tutorial/explorer.html">Chain Explorer</a> to see your block on the chain!</p>
+        </div>
+      </section>
+
+    </div><!-- .content-inner -->
+  </main>
+
+</div><!-- .layout -->
+
+<!-- Back to Top -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top">
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 16V4M4 10l6-6 6 6"/>
+  </svg>
+</button>
+
+<script>
+(function () {
+  // --- Mobile menu ---
+  const toggle = document.getElementById('menuToggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  function openMenu() {
+    sidebar.classList.add('open');
+    toggle.classList.add('open');
+    overlay.classList.add('visible');
+  }
+
+  function closeMenu() {
+    sidebar.classList.remove('open');
+    toggle.classList.remove('open');
+    overlay.classList.remove('visible');
+  }
+
+  toggle.addEventListener('click', function () {
+    if (sidebar.classList.contains('open')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  overlay.addEventListener('click', closeMenu);
+
+  // Close menu on nav link click (mobile)
+  document.querySelectorAll('.sidebar-nav a').forEach(function (link) {
+    link.addEventListener('click', function () {
+      if (window.innerWidth <= 768) {
+        closeMenu();
+      }
+    });
+  });
+
+  // --- Active nav highlighting on scroll ---
+  var navLinks = document.querySelectorAll('.sidebar-nav a');
+  var sections = [];
+
+  navLinks.forEach(function (link) {
+    var id = link.getAttribute('data-step');
+    var el = document.getElementById(id);
+    if (el) sections.push({ id: id, el: el, link: link });
+  });
+
+  function updateActiveNav() {
+    var scrollY = window.scrollY + 100;
+    var current = sections[0];
+
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].el.offsetTop <= scrollY) {
+        current = sections[i];
+      }
+    }
+
+    navLinks.forEach(function (link) {
+      link.classList.remove('active');
+    });
+
+    if (current) {
+      current.link.classList.add('active');
+    }
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+
+  // --- Back to top ---
+  var backBtn = document.getElementById('backToTop');
+
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > 600) {
+      backBtn.classList.add('visible');
+    } else {
+      backBtn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  backBtn.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+</body>
+</html>

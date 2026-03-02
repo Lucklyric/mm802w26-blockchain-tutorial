@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 .keys
 *.egg-info/
-data/chain.json
-data/ledger.json
+server/simplechain/data/chain.json
+server/simplechain/data/ledger.json
 .venv/
+uv.lock

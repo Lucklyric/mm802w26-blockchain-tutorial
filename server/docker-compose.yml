@@ -2,7 +2,7 @@ services:
   blockchain:
     build:
       context: .
-      dockerfile: server/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "80:8000"
     volumes:

@@ -1,7 +1,7 @@
 import hashlib
 import json
 
-from ecdsa import SECP256k1, BadSignatureError, SigningKey, VerifyingKey
+from ecdsa import SECP256k1, SigningKey, VerifyingKey
 from ecdsa.util import sigdecode_der
 
 
@@ -30,5 +30,5 @@ def verify_signature(pubkey_hex: str, signature_hex: str, message: str) -> bool:
         vk = VerifyingKey.from_string(bytes.fromhex(pubkey_hex), curve=SECP256k1)
         vk.verify(bytes.fromhex(signature_hex), message.encode(), hashfunc=hashlib.sha256, sigdecode=sigdecode_der)
         return True
-    except (BadSignatureError, Exception):
+    except Exception:
         return False
