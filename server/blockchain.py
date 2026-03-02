@@ -125,6 +125,11 @@ class Blockchain:
             "ledger": self.ledger,
         }
 
+    def get_block(self, index: int) -> dict:
+        if index < 0 or index >= len(self.chain):
+            raise HTTPException(status_code=404, detail=f"Block {index} not found")
+        return self.chain[index]
+
     def get_latest(self) -> dict:
         return self.chain[-1]
 

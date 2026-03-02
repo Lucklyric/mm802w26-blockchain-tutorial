@@ -46,6 +46,11 @@ def get_latest():
     return bc.get_latest()
 
 
+@app.get("/block/{index}")
+def get_block(index: int):
+    return bc.get_block(index)
+
+
 @app.get("/difficulty")
 def get_difficulty():
     return bc.get_difficulty()
